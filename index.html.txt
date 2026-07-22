@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday Sahiba!</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0b0b0b;
+      color: #ff69b4;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      flex-direction: column;
+    }
+
+    /* Matrix Canvas Background */
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Container for content */
+    .container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      width: 90%;
+      max-width: 600px;
+    }
+
+    /* Countdown & Text Overlay */
+    .message-screen {
+      font-size: 2.8rem;
+      font-weight: bold;
+      color: #ff69b4;
+      text-shadow: 0 0 10px #ff1493, 0 0 20px #ff1493;
+      margin-bottom: 20px;
+      min-height: 100px;
+    }
+
+    /* Interactive Card Section */
+    .card-section {
+      display: none;
+      perspective: 1000px;
+      margin: 20px auto;
+      cursor: pointer;
+      width: 300px;
+      height: 420px;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
+
+    .card-section.open .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 15px;
+      border: 2px solid #ff69b4;
+      box-shadow: 0 0 15px rgba(255, 105, 180, 0.4);
+      background: #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .card-front {
+      background: linear-gradient(135deg, #2b0018, #1a1a1a);
+    }
+
+    .card-front h2 {
+      color: #fff;
+      font-size: 1.5rem;
+      margin-top: 15px;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      background: #fff;
+      color: #333;
+    }
+
+    .card-back img {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .card-back p {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-size: 0.95rem;
+      color: #444;
+    }
+
+    /* Multilingual Wishes Styling */
+    .multilingual-box {
+      height: 45px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 8px 0;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .multilingual-text {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: #ff1493;
+      transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+    }
+
+    /* Heart Collage Grid */
+    .heart-collage {
+      display: none;
+      position: relative;
+      width: 320px;
+      height: 300px;
+      margin: 30px auto;
+    }
+
+    .heart-collage img {
+      position: absolute;
+      width: 65px;
+      height: 65px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid #ff69b4;
+      box-shadow: 0 0 8px rgba(255, 105, 180, 0.6);
+      transition: transform 0.3s;
+    }
+
+    .heart-collage img:hover {
+      transform: scale(1.2);
+      z-index: 10;
+    }
+
+    /* Button */
+    .btn {
+      background: #ff1493;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #ff1493;
+      transition: 0.3s;
+      margin-top: 15px;
+    }
+
+    .btn:hover {
+      background: #ff69b4;
+      box-shadow: 0 0 20px #ff69b4;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Matrix Background Canvas -->
+  <canvas id="matrix"></canvas>
+
+  <div class="container">
+    <div class="message-screen" id="display-text">Tap Start</div>
+    <button class="btn" id="start-btn" onclick="startAnimation()">Start</button>
+
+    <!-- Interactive Greeting Card -->
+    <div class="card-section" id="card" onclick="toggleCard()">
+      <div class="card-inner">
+        <div class="card-front">
+          <div style="font-size: 50px;">💌</div>
+          <h2>Tap to Open</h2>
+        </div>
+        <div class="card-back">
+          <!-- Replace this image URL with her photo -->
+          <img src="https://picsum.photos/300/200" alt="Sahiba">
+          <p><strong>Happy Birthday, Sahiba! ❤️</strong></p>
+          
+          <!-- Cycling Multilingual Wishes -->
+          <div class="multilingual-box">
+            <div class="multilingual-text" id="multilingual-text">
+              English: Happy Birthday! 🎂
+            </div>
+          </div>
+
+          <p style="font-size: 0.75rem; color: #777;">
+            (Wishing you in every language!)
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Heart Shaped Photo Collage -->
+    <div class="heart-collage" id="collage"></div>
+  </div>
+
+  <script>
+    // Matrix Rain Effect
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const chars = '0123456789ABCDEF💗✨🎂🎉';
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = Array.from({ length: columns }).fill(1);
+
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(11, 11, 11, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#ff69b4';
+      ctx.font = fontSize + 'px monospace';
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = chars.charAt(Math.floor(Math.random() * chars.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+    setInterval(drawMatrix, 33);
+
+    // Sequence Controls
+    const displayText = document.getElementById('display-text');
+    const startBtn = document.getElementById('start-btn');
+    const card = document.getElementById('card');
+    const collage = document.getElementById('collage');
+
+    function startAnimation() {
+      startBtn.style.display = 'none';
+      let count = 3;
+
+      let timer = setInterval(() => {
+        displayText.innerText = count;
+        count--;
+
+        if (count < 0) {
+          clearInterval(timer);
+          showBirthdaySequence();
+        }
+      }, 1000);
+    }
+
+    function showBirthdaySequence() {
+      displayText.innerText = "Happy Birthday Sahiba! ❤️";
+      setTimeout(() => {
+        card.style.display = 'block';
+        createHeartCollage();
+      }, 1500);
+    }
+
+    function toggleCard() {
+      card.classList.toggle('open');
+      if (card.classList.contains('open')) {
+        setTimeout(() => {
+          collage.style.display = 'block';
+        }, 800);
+      }
+    }
+
+    // Multilingual Wishes Array
+    const globalWishes = [
+      "English: Happy Birthday! 🎂",
+      "Hindi: जन्म दिन मुबारक हो! 🎉",
+      "Spanish: ¡Feliz Cumpleaños! 🌹",
+      "French: Joyeux Anniversaire! ✨",
+      "German: Alles Gute zum Geburtstag! 🎈",
+      "Italian: Buon Compleanno! 💖",
+      "Japanese: お誕生日おめでとう! 🌸",
+      "Korean: 생일 축하해요! 🎁",
+      "Arabic: عيد ميلاد سعيد! 🌙",
+      "Russian: С Днём Рождения! ⭐️",
+      "Portuguese: Feliz Aniversário! 🥳",
+      "Chinese: 祝你生日快乐! 🌺",
+      "Bengali: শুভ জন্মদিন! 🌷",
+      "Turkish: Doğum günün kutlu olsun! ✨",
+      "Dutch: Gefeliciteerd met je verjaardag! 🍰",
+      "Greek: Χρόνια Πολλά! 💫",
+      "Swahili: Siku njema ya kuzaliwa! 🌍",
+      "Thai: สุขสันต์วันเกิด! 🌼",
+      "Vietnamese: Chúc mừng sinh nhật! 💐",
+      "Polish: Wszystkiego najlepszego! 🎊"
+    ];
+
+    let wishIndex = 0;
+    const wishElement = document.getElementById('multilingual-text');
+
+    function cycleWishes() {
+      if (!wishElement) return;
+      
+      wishElement.style.opacity = '0';
+      wishElement.style.transform = 'translateY(-10px)';
+
+      setTimeout(() => {
+        wishIndex = (wishIndex + 1) % globalWishes.length;
+        wishElement.innerText = globalWishes[wishIndex];
+        
+        wishElement.style.opacity = '1';
+        wishElement.style.transform = 'translateY(0)';
+      }, 400);
+    }
+
+    setInterval(cycleWishes, 2000);
+
+    // Heart Shaped Positions
+    function createHeartCollage() {
+      const heartPositions = [
+        {x: 120, y: 20}, {x: 180, y: 20},
+        {x: 70, y: 50}, {x: 230, y: 50},
+        {x: 40, y: 100}, {x: 260, y: 100},
+        {x: 60, y: 160}, {x: 240, y: 160},
+        {x: 100, y: 220}, {x: 200, y: 220},
+        {x: 150, y: 260}
+      ];
+
+      heartPositions.forEach((pos, index) => {
+        const img = document.createElement('img');
+        img.src = `https://picsum.photos/100/100?random=${index + 1}`;
+        img.style.left = pos.x + 'px';
+        img.style.top = pos.y + 'px';
+        collage.appendChild(img);
+      });
+    }
+
+    // Responsive Canvas Resize
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
